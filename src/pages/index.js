@@ -1,7 +1,6 @@
 import React from "react";
 import { Helmet } from "react-helmet";
-import L from "leaflet";
-
+import axios from "axios";
 
 import Layout from "components/Layout";
 import Container from "components/Container";
@@ -21,7 +20,17 @@ const DEFAULT_ZOOM = 2;
  */
 
 async function mapEffect ({ leafletElement } = {}){
+  let response;
+  try{
+    response = await axios.get("https://disease.sh/v3/covid-19/countries");
+  } catch(e){
+    console.log(`Failed to fetch countries : ${e.message}`,e);
+    return;
+  }
 
+  const {data = []} = response; 
+  console.log(response);
+  console.log("Data::",data);
 };
 
 const IndexPage = () => {
