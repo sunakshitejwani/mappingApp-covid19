@@ -46,6 +46,12 @@ const popupContentGatsby = `
 const MapEffect = ({ markerRef}) => {
   const map = useMap();
 
+  const { data: stats = {} } = useTracker({
+    api: 'all'
+  });
+  
+  console.log("stats:",stats);
+
   const { data: countries = [] } = useTracker({
     api: 'countries'
   });
@@ -53,6 +59,7 @@ const MapEffect = ({ markerRef}) => {
   console.log("data::", countries);
 
   const hasCountries = Array.isArray(countries) && countries.length > 0;
+
   useEffect(() => {
     if (!markerRef.current || !map) return;
 
