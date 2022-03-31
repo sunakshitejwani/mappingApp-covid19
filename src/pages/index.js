@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from "react";
 import { Helmet } from "react-helmet";
 import L from "leaflet";
 import { Marker, useMap } from "react-leaflet";
-import axios from "axios";
 
 import { promiseToFlyTo, getCurrentLocation } from "lib/map";
 
@@ -10,6 +9,7 @@ import Layout from "components/Layout";
 import Container from "components/Container";
 import Map from "components/Map";
 import Snippet from "components/Snippet";
+import { useTracker } from 'hooks';
 
 import gatsby_astronaut from "assets/images/gatsby-astronaut.jpg";
 
@@ -43,33 +43,27 @@ const popupContentGatsby = `
  * @description This is an example of creating an effect used to zoom in and set a popup on load
  */
 
-const MapEffect = ({ markerRef }) => {
+const MapEffect = ({ markerRef}) => {
   const map = useMap();
 
+  const { data: countries = [] } = useTracker({
+    api: 'countries'
+  });
+
+  console.log("data::", countries);
+
+  const hasCountries = Array.isArray(countries) && countries.length > 0;
   useEffect(() => {
-    //if (!markerRef.current || !map) return;
+    if (!markerRef.current || !map) return;
 
     (async function run() {
       console.log("inside");
-      let response;
-
-      try {
-        response = await axios.get("https://disease.sh/v3/covid-19/countries");
-      } catch (e) {
-        console.log(`Failed to fetch countries: ${e.message}`, e);
-        return;
-      }
-
-      const { data = [] } = response;
-      console.log(data);
-
-      const hasData = Array.isArray(data) && data.length > 0;
-
-      if (!hasData) return;
+      
+      if (!hasCountries) return;
 
       const geoJson = {
         type: "FeatureCollection",
-        features: data.map((country = {}) => {
+        features: countries.map((country = {}) => {
           const { countryInfo = {} } = country;
           const { lat, long: lng } = countryInfo;
           return {
@@ -187,7 +181,7 @@ const IndexPage = () => {
       </Helmet>
 
       <Map {...mapSettings}>
-        <MapEffect markerRef={markerRef} />
+        <MapEffect markerRef={markerRef}/>
         <Marker ref={markerRef} position={CENTER} />
       </Map>
 
