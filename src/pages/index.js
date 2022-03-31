@@ -9,7 +9,7 @@ import Layout from "components/Layout";
 import Container from "components/Container";
 import Map from "components/Map";
 import Snippet from "components/Snippet";
-import { useTracker } from 'hooks';
+import { useTracker } from "hooks";
 
 import gatsby_astronaut from "assets/images/gatsby-astronaut.jpg";
 
@@ -43,29 +43,15 @@ const popupContentGatsby = `
  * @description This is an example of creating an effect used to zoom in and set a popup on load
  */
 
-const MapEffect = ({ markerRef}) => {
+const MapEffect = ({ markerRef, hasCountries, countries }) => {
   const map = useMap();
-
-  const { data: stats = {} } = useTracker({
-    api: 'all'
-  });
-  
-  console.log("stats:",stats);
-
-  const { data: countries = [] } = useTracker({
-    api: 'countries'
-  });
-
-  console.log("data::", countries);
-
-  const hasCountries = Array.isArray(countries) && countries.length > 0;
-
+  console.log(countries);
   useEffect(() => {
     if (!markerRef.current || !map) return;
 
     (async function run() {
       console.log("inside");
-      
+
       if (!hasCountries) return;
 
       const geoJson = {
@@ -93,25 +79,19 @@ const MapEffect = ({ markerRef}) => {
           const { properties = {} } = feature;
           let updatedFormatted;
           let casesString;
-      
-          const {
-            country,
-            updated,
-            cases,
-            deaths,
-            recovered
-          } = properties
-      
+
+          const { country, updated, cases, deaths, recovered } = properties;
+
           casesString = `${cases}`;
-      
-          if ( cases > 1000 ) {
-            casesString = `${casesString.slice(0, -3)}k+`
+
+          if (cases > 1000) {
+            casesString = `${casesString.slice(0, -3)}k+`;
           }
-      
-          if ( updated ) {
+
+          if (updated) {
             updatedFormatted = new Date(updated).toLocaleString();
           }
-      
+
           const html = `
             <span class="icon-marker">
               <span class="icon-marker-tooltip">
@@ -123,13 +103,13 @@ const MapEffect = ({ markerRef}) => {
                   <li><strong>Last Update:</strong> ${updatedFormatted}</li>
                 </ul>
               </span>
-              ${ casesString }
+              ${casesString}
             </span>
           `;
-      
-          return L.marker( latlng, {
+
+          return L.marker(latlng, {
             icon: L.divIcon({
-              className: 'icon',
+              className: "icon",
               html
             }),
             riseOnHover: true
@@ -138,34 +118,6 @@ const MapEffect = ({ markerRef}) => {
       });
 
       geoJsonLayers.addTo(map);
-      
-
-      // const popup = L.popup({
-      //   maxWidth: 800,
-      // });
-
-      // const location = await getCurrentLocation().catch(() => LOCATION);
-
-      // const { current: marker } = markerRef || {};
-
-      // marker.setLatLng(location);
-      // popup.setLatLng(location);
-      // popup.setContent(                                                                                                                                                          popupContentHello);
-
-      // setTimeout(async () => {
-      //   await promiseToFlyTo(map, {
-      //     zoom: ZOOM,
-      //     center: location,
-      //   });
-
-      //   marker.bindPopup(popup);
-
-      //   setTimeout(() => marker.openPopup(), timeToOpenPopupAfterZoom);
-      //   setTimeout(
-      //     () => marker.setPopupContent(popupContentGatsby),
-      //     timeToUpdatePopupAfterZoom
-      //   );
-      // }, timeToZoom);
     })();
   }, [map, markerRef]);
 
@@ -174,6 +126,53 @@ const MapEffect = ({ markerRef}) => {
 
 const IndexPage = () => {
   const markerRef = useRef();
+
+  const { data: stats = {} } = useTracker({
+    api: "all"
+  });
+
+  console.log("stats:", stats);
+
+  const { data: countries = [] } = useTracker({
+    api: "countries"
+  });
+
+  console.log("data::", countries);
+
+  const hasCountries = Array.isArray(countries) && countries.length > 0;
+
+  const dashboardStats = [
+    {
+      primary: {
+        label: "Total Cases",
+        value: stats?.cases
+      },
+      secondary: {
+        label: "Per 1 Million",
+        value: stats?.casesPerOneMillion
+      }
+    },
+    {
+      primary: {
+        label: "Total Deaths",
+        value: stats?.deaths
+      },
+      secondary: {
+        label: "Per 1 Million",
+        value: stats?.deathsPerOneMillion
+      }
+    },
+    {
+      primary: {
+        label: "Total Tests",
+        value: stats?.tests
+      },
+      secondary: {
+        label: "Per 1 Million",
+        value: stats?.testsPerOneMillion
+      }
+    }
+  ];
 
   const mapSettings = {
     center: CENTER,
@@ -186,11 +185,38 @@ const IndexPage = () => {
       <Helmet>
         <title>Home Page</title>
       </Helmet>
-
-      <Map {...mapSettings}>
-        <MapEffect markerRef={markerRef}/>
-        <Marker ref={markerRef} position={CENTER} />
-      </Map>
+      <div className="tracker">
+        <Map {...mapSettings}>
+          <MapEffect
+            markerRef={markerRef}
+            hasCountries={hasCountries}
+            countries={countries}
+          />
+          <Marker ref={markerRef} position={CENTER} />
+        </Map>
+        <div className="tracker-stats">
+          <ul>
+            {dashboardStats.map(({ primary = {}, secondary = {} }, i) => {
+              return (
+                <li key={`Stat-${i}`} className="tracker-stat">
+                  {primary.value && (
+                    <p className="tracker-stat-primary">
+                      {primary.value}
+                      <strong>{primary.label}</strong>
+                    </p>
+                  )}
+                  {secondary.value && (
+                    <p className="tracker-stat-secondary">
+                      {secondary.value}
+                      <strong>{secondary.label}</strong>
+                    </p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </div>
 
       <Container type="content" className="text-center home-start">
         <h2>Still Getting Started?</h2>
