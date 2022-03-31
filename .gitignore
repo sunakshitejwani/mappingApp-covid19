@@ -72,3 +72,5 @@ yarn-error.log
 cypress
 tests/screenshots
 tests/videos
+
+creds
