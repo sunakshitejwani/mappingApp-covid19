@@ -10,8 +10,7 @@ import Container from "components/Container";
 import Map from "components/Map";
 import Snippet from "components/Snippet";
 import { useTracker } from "hooks";
-import { commafy } from 'lib/util';
-
+import { commafy, friendlyDate } from "lib/util";
 
 import gatsby_astronaut from "assets/images/gatsby-astronaut.jpg";
 
@@ -147,31 +146,31 @@ const IndexPage = () => {
     {
       primary: {
         label: "Total Cases",
-        value: stats ? commafy(stats?.cases) : '-'
+        value: stats ? commafy(stats?.cases) : "-"
       },
       secondary: {
         label: "Per 1 Million",
-        value: stats ? commafy(stats?.casesPerOneMillion) : '-'
+        value: stats ? commafy(stats?.casesPerOneMillion) : "-"
       }
     },
     {
       primary: {
         label: "Total Deaths",
-        value: stats ? commafy(stats?.deaths) : '-'
+        value: stats ? commafy(stats?.deaths) : "-"
       },
       secondary: {
         label: "Per 1 Million",
-        value:stats ? commafy(stats?.deathsPerOneMillion) : '-'
+        value: stats ? commafy(stats?.deathsPerOneMillion) : "-"
       }
     },
     {
       primary: {
         label: "Total Tests",
-        value: stats ? commafy(stats?.tests) : '-'
+        value: stats ? commafy(stats?.tests) : "-"
       },
       secondary: {
         label: "Per 1 Million",
-        value: stats ? commafy(stats?.testsPerOneMillion) : '-'
+        value: stats ? commafy(stats?.testsPerOneMillion) : "-"
       }
     }
   ];
@@ -217,6 +216,9 @@ const IndexPage = () => {
               );
             })}
           </ul>
+        </div>
+        <div className="tracker-last-updated">
+          <p>Last Updated: {stats ? friendlyDate(stats?.updated) : '-'}</p>
         </div>
       </div>
 
