@@ -10,6 +10,8 @@ import Container from "components/Container";
 import Map from "components/Map";
 import Snippet from "components/Snippet";
 import { useTracker } from "hooks";
+import { commafy } from 'lib/util';
+
 
 import gatsby_astronaut from "assets/images/gatsby-astronaut.jpg";
 
@@ -145,31 +147,31 @@ const IndexPage = () => {
     {
       primary: {
         label: "Total Cases",
-        value: stats?.cases
+        value: stats ? commafy(stats?.cases) : '-'
       },
       secondary: {
         label: "Per 1 Million",
-        value: stats?.casesPerOneMillion
+        value: stats ? commafy(stats?.casesPerOneMillion) : '-'
       }
     },
     {
       primary: {
         label: "Total Deaths",
-        value: stats?.deaths
+        value: stats ? commafy(stats?.deaths) : '-'
       },
       secondary: {
         label: "Per 1 Million",
-        value: stats?.deathsPerOneMillion
+        value:stats ? commafy(stats?.deathsPerOneMillion) : '-'
       }
     },
     {
       primary: {
         label: "Total Tests",
-        value: stats?.tests
+        value: stats ? commafy(stats?.tests) : '-'
       },
       secondary: {
         label: "Per 1 Million",
-        value: stats?.testsPerOneMillion
+        value: stats ? commafy(stats?.testsPerOneMillion) : '-'
       }
     }
   ];
